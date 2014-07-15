@@ -45,7 +45,7 @@ requesting it with no additional overhead (assuming you load specific assets
 for the client instead of general-purpose ones).
 
 The detection page will distort normal referral information from the browser,
-and the middleware will save the original referrer for you. 
+and the detection javascript will save the original referrer for you.
 
 Detected features
 -----------------
