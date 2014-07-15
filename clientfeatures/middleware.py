@@ -1,3 +1,4 @@
+from copy import copy
 from datetime import datetime, timedelta
 
 from django.conf import settings
@@ -41,7 +42,7 @@ class DetectFeaturesMiddleware:
             if features is None and not self.should_skip_detection(request):
                 return self.render_detect_page(request)
             else:
-                features = features or self.extract_features_from_detection({})
+                features = features or self.get_default_features()
                 request.client_features = features
 
     def process_response(self, request, response):
@@ -99,6 +100,9 @@ class DetectFeaturesMiddleware:
             touch = parameters['touch'] == 'true'
         return 'touch' if touch else 'pointer'
 
+    def get_default_features(self):
+        return self.extract_features_from_detection({})
+
     def extract_features_from_cookie(self, features_cookie):
         return self.get_cookie_parameters(features_cookie)
 
@@ -112,7 +116,10 @@ class DetectFeaturesMiddleware:
     def override(self, override_parameter):
         if override_parameter == 'remove':
             return None
+        elif override_parameter == self.default_features_query:
+            return self.get_default_features()
         else:
+            # TODO: determine override_parameter => feature mapping
             return override_parameter
 
     #
@@ -141,7 +148,12 @@ class DetectFeaturesMiddleware:
         return self.override_parameter
 
     def get_default_path(self, request):
-        return # TODO: insert default_features_query into path
+        get = copy(request.GET)
+        get[self.get_override_parameter()] = self.default_features_query
+        return '{path}?{query}'.format(
+            path=request.path,
+            query=get.urlencode()
+        )
 
     #
     #
@@ -157,9 +169,6 @@ class DetectFeaturesMiddleware:
 
     def should_skip_detection(self, request):
         return self.is_ignored_path(request.get_full_path())
-
-    def is_default_path(self, path):
-        return # TODO: check if query in path
 
     def is_ignored_path(self, path):
         return any(
