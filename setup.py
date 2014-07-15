@@ -4,12 +4,12 @@ with open('README.rst') as file:
     long_description = file.read()
 
 setup(
-    name='django-devicefeatures',
+    name='django-clientfeatures',
     version='0.1.0a1',
-    url='http://github.com/bpeschier/django-devicefeatures',
+    url='http://github.com/bpeschier/django-clientfeatures',
     author='Bas Peschier',
     author_email='bpeschier@fizzgig.nl',
-    packages=['devicefeatures'],
+    packages=['clientfeatures'],
     license='MIT',
     long_description=long_description,
     classifiers=[

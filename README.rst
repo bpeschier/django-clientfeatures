@@ -1,36 +1,36 @@
-django-devicefeatures
+django-clientfeatures
 =====================
 
-Detects device features from javascript and exposes the information in the 
+Detects client features from javascript and exposes the information in the
 request/response cycle and templates contexts.
 
 Installation
 ------------
 
-To get started using ``django-devicefeatures`` simply install it with
+To get started using ``django-clientfeatures`` simply install it with
 ``pip``::
 
-    $ pip install git@github.com:bpeschier/django-devicefeatures.git
+    $ pip install git@github.com:bpeschier/django-clientfeatures.git
 
 
 Configuration
 -------------
 
-Add ``"devicefeatures.apps.DeviceFeaturesAppConfig"`` to your project's
-``INSTALLED_APPS`` setting (``"devicefeatures"`` on Django 1.6) and 
-``"devicefeatures.middleware.DetectFeaturesMiddleware"`` to your
+Add ``"clientfeatures.apps.DeviceFeaturesAppConfig"`` to your project's
+``INSTALLED_APPS`` setting (``"clientfeatures"`` on Django 1.6) and
+``"clientfeatures.middleware.DetectFeaturesMiddleware"`` to your
 ``MIDDLEWARE_CLASSES`` setting for the default detection. For template 
-context support, add ``"devicefeatures.context_processors.device_features"`` 
+context support, add ``"clientfeatures.context_processors.client_features"``
 to the list of ``CONTEXT_PREPROCESSORS``.
 
 How it works / rationale
 ------------------------
 
-``devicefeatures`` is intended to identify what features are available on the
-client (the browser) which are not always directly identifiable from HTTP 
-headers: the screen density, size and which method of input is used. For this,
-it detects the features in javascript at the beginning of the session and
-stores it on a cookie.
+``clientfeatures`` is intended to identify what features are available on the
+client which are not always directly identifiable from HTTP  headers: the
+screen density, size and which method of input is used. For this, it detects
+the features in javascript at the beginning of the session and stores it on
+a cookie.
 
 A cookie is set with the ``devicePixelRatio``, screen size and touch
 capabilities reported by the browser. This data is converted into a dictionary
@@ -42,7 +42,7 @@ significant on mobile. The upside is that this overhead occurs only once and
 the resulting cookie can be used for varying the cache of the different
 responses. The served page is going to be the correct one for the device
 requesting it with no additional overhead (assuming you load specific assets
-for the device instead of general-purpose ones). 
+for the client instead of general-purpose ones).
 
 The detection page will distort normal referral information from the browser,
 and the middleware will save the original referrer for you. 
@@ -50,7 +50,7 @@ and the middleware will save the original referrer for you.
 Detected features
 -----------------
 
-The ``DetectFeaturesMiddleware`` adds a ``device_features`` dictionary to all
+The ``DetectFeaturesMiddleware`` adds a ``client_features`` dictionary to all
 `request` objects. By default it consists of the following items:
 
 screen_density
@@ -63,7 +63,7 @@ input
     Either `pointer` or `touch`.
 
 When the template context preprocessor is configured, it wil expose the same
-dictionary as `device_features`.
+dictionary as `client_features`.
 
 Extending or overriding detection
 ---------------------------------
@@ -89,7 +89,7 @@ Loading feature-specific static files
 
 The ``feature_tags`` template tag library overrides the default ``static``
 template tag and accepts string format parameters for features in the
-``device_features`` dictionary, for example::
+``client_features`` dictionary, for example::
 
     {% static "css/screen-{input}.css" %}
 
@@ -104,7 +104,7 @@ Crawlers and low-tech clients
 -----------------------------
 
 Devices without javascript will be diverted to the "default" setting, which is
-a normal pointer-operated device. This is done with a meta-refresh.
+a normal pointer-operated client. This is done with a meta-refresh.
 
 Crawlers and other clients can be exempted from the entire detection based on
 their User agent string. These clients will also be given the default profile, 

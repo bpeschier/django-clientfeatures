@@ -7,7 +7,7 @@ register = template.Library()
 class FeaturesStaticNode(StaticNode):
     def url(self, context):
         return self.handle_simple(
-            self.path.resolve(context).format(context.get('device_features'))
+            self.path.resolve(context).format(context.get('client_features'))
         )
 
 

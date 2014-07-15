@@ -7,11 +7,10 @@ from django.shortcuts import render
 class DetectFeaturesMiddleware:
     feature_cookie_name = '_df'
     feature_cookie_expires = timedelta(weeks=52)
+    referrer_cookie_name = '_ref'
     detection_cookie_name = '_detect'
-    detection_cookie_expires = timedelta(hours=1)
-    original_referrer_cookie_name = '_original_referrer'
-    original_referrer_cookie_expires = timedelta(hours=1)
     override_parameter = 'df'
+    default_features_query = '?default'
 
     default_screen_density = 1.0
     default_screen_size = (1024, 768)
@@ -43,23 +42,19 @@ class DetectFeaturesMiddleware:
                 return self.render_detect_page(request)
             else:
                 features = features or self.extract_features_from_detection({})
-                request.device_features = features
+                request.client_features = features
 
     def process_response(self, request, response):
         if (self.get_feature_cookie_name() not in request.COOKIES and
-                hasattr(request, 'device_features') and request.device_features is not None):
-            self.set_features_cookie(request, response, features=request.device_eatures)
-
-        if hasattr(request, '_original_referrer'):
-            response.set_cookie(self.get_original_referrer_cookie_name(), value=request._original_referrer,
-                                expires=self.get_original_referrer_cookie_expiration(request))
+                hasattr(request, 'client_features') and request.client_features is not None):
+            self.set_features_cookie(request, response, features=request.client_features)
 
         return response
 
     def render_detect_page(self, request):
         return render(request, 'features/detect.html', {
             'cookie_name': self.get_detection_cookie_name(),
-            'cookie_expires': self.get_detection_cookie_expiration(request),
+            'referrer_cookie_name': self.get_referrer_cookie_name(),
             'default_path': self.get_default_path(request)
         })
 
@@ -71,10 +66,6 @@ class DetectFeaturesMiddleware:
         if detection_cookie is not None:
             parameters = self.get_cookie_parameters(detection_cookie)
             features = self.extract_features_from_detection(parameters)
-
-            # if referrer is set, mark it so we can send it back
-            if 'referrer' in parameters:
-                request._original_referrer = parameters['referrer']
         elif features_cookie is not None:
             features = self.extract_features_from_cookie(features_cookie)
 
@@ -140,23 +131,17 @@ class DetectFeaturesMiddleware:
     def get_feature_cookie_expiration(self, request):
         return datetime.now() + self.feature_cookie_expires
 
+    def get_referrer_cookie_name(self):
+        return self.referrer_cookie_name
+
     def get_detection_cookie_name(self):
         return self.detection_cookie_name
-
-    def get_detection_cookie_expiration(self, request):
-        return datetime.now() + self.detection_cookie_expires
 
     def get_override_parameter(self):
         return self.override_parameter
 
-    def get_original_referrer_cookie_name(self):
-        return self.feature_cookie_name
-
-    def get_original_referrer_cookie_expiration(self, request):
-        return datetime.now() + self.feature_cookie_expires
-
     def get_default_path(self, request):
-        pass  # TODO
+        return # TODO: insert default_features_query into path
 
     #
     #
@@ -172,6 +157,9 @@ class DetectFeaturesMiddleware:
 
     def should_skip_detection(self, request):
         return self.is_ignored_path(request.get_full_path())
+
+    def is_default_path(self, path):
+        return # TODO: check if query in path
 
     def is_ignored_path(self, path):
         return any(

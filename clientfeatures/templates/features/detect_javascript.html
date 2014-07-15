@@ -1,0 +1,14 @@
+<script>
+  if (navigator.cookieEnabled) {
+    var touch = "touch:" + (('ontouchstart' in window) || (window.DocumentTouch && document instanceof DocumentTouch));
+    var screen_size = "screen:" + screen.width + "x" + screen.height;
+    var pixelRatio = window.devicePixelRatio || Math.round(window.screen.availWidth / document.documentElement.clientWidth);
+    var density = "density:" + pixelRatio.toFixed(1);
+
+    document.cookie = "{{ cookie_name }}=" + touch + "," + screen_size + "," + density + ";path=/";
+    document.cookie = "{{ referrer_cookie_name }}=" + encodeURI(document.referrer) + ";path=/";
+    window.location.reload(true);
+  } else {
+    window.location.href = "{{ default_path }}";
+  }
+</script>
