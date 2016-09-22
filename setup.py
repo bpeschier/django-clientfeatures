@@ -10,6 +10,7 @@ setup(
     author='Bas Peschier',
     author_email='bpeschier@fizzgig.nl',
     packages=['clientfeatures'],
+    include_package_data=True,
     license='MIT',
     long_description=long_description,
     classifiers=[

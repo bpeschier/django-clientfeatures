@@ -28,6 +28,7 @@ class DetectFeaturesMiddleware:
         settings.STATIC_URL,
         '/robots.txt',
     )
+    template_name = 'features/detect.html'
 
     def process_request(self, request):
         request.features = None
@@ -53,7 +54,7 @@ class DetectFeaturesMiddleware:
         return response
 
     def render_detect_page(self, request):
-        return render(request, 'features/detect.html', {
+        return render(request, self.template_name, {
             'cookie_name': self.get_detection_cookie_name(),
             'referrer_cookie_name': self.get_referrer_cookie_name(),
             'default_path': self.get_default_path(request)
