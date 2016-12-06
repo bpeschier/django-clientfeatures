@@ -31,7 +31,7 @@ class DetectFeaturesMiddleware:
     template_name = 'features/detect.html'
 
     def process_request(self, request):
-        request.features = None
+        request.client_features = None
         if not self.should_skip_detection(request):
             features = self.get_features(request)
 
