@@ -169,7 +169,7 @@ class DetectFeaturesMiddleware:
         return self.is_featureless_agent(request.META.get('HTTP_USER_AGENT'))
 
     def should_skip_detection(self, request):
-        return self.is_ignored_path(request.get_full_path())
+        return self.is_ignored_path(request.get_full_path()) or self.is_featureless(request)
 
     def is_ignored_path(self, path):
         return any(
@@ -178,7 +178,8 @@ class DetectFeaturesMiddleware:
         )
 
     def is_featureless_agent(self, user_agent):
-        return any(
-            crawler in user_agent
-            for crawler in self.get_featureless_agents()
-        )
+        if user_agent:
+            return any(
+                crawler in user_agent
+                for crawler in self.get_featureless_agents()
+            )
